@@ -2,32 +2,34 @@
 var topics = ["Tennis", "Walking", "Wine", "Chocolate", "Roadtrip", "Trains", "Mountains", "Zumba"];
 
 //function displayTopicGifs when buttons are pushed
+//included function to empty row for images every time button is pushed. I prefer it this way. Did not like it when
+//screen wasn't cleared.
 
 function displayTopicGifs() {
     $(".row").empty();
 
     var gifTopic = $(this).attr("data-topic");
 
-    // Constructing a URL to search Giphy for the name of the person who said the quote
+    // Constructing a URL to search Giphy for topics from my array as well as from user input
     var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
         gifTopic + "&api_key=17f3JO9jM3wsnPgNiSDOLWj2q4YqNpTt&limit=10";
 
-    // Performing our AJAX GET request
+    // ajax call function to go to giphy.com and get images based on search criteria. Include rating if g or pg (not above)
     $.ajax({
         url: queryURL,
         method: "GET"
     })
-        // After the data comes back from the API
+        // After images come back from the API
         .then(function (response) {
             // Storing an array of results in the results variable
             var results = response.data;
 
-            // Looping over every result item
+            // Looping over every result image and rating
             for (var i = 0; i < results.length; i++) {
 
                 // Only taking action if the photo has an appropriate rating
                 if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
-                    // Creating a div for the gif
+                    // Creating a div for the gifs with col attribute to help in CSS sizing and layout
                     var gifDiv = $("<div class='col'>");
 
                     // Storing the result item's rating
@@ -39,27 +41,24 @@ function displayTopicGifs() {
                     // Creating an image tag
                     var topicImage = $("<img>");
 
-                    // Giving the image tag an src attribute of a proprty pulled off the
-                    // result item
+                    // Assign attribute of src URL, animate and still URLs, animate and still "states" and class of gif
                     topicImage.attr("src", results[i].images.fixed_height_still.url);
                     topicImage.attr("data-animate", results[i].images.fixed_height.url);
                     topicImage.attr("data-still", results[i].images.fixed_height_still.url);
                     topicImage.attr("data-state", "still");
                     topicImage.addClass("gif");
 
-                    // Appending the paragraph and personImage we created to the "gifDiv" div we created
+                    // Appending images and ratings to the variables
                     gifDiv.append(topicImage);
                     gifDiv.append(p);
-                    // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
-                    // $("#gifs-appear-here").empty();
-
+                    //writing images and ratings to the DOM
                     $(".row").prepend(gifDiv);
                 }
             }
         });
 }
 
-// Function that runs to walk through topics array and create/display buttons for each topic
+// Function that loops through topics array and creates/displays buttons for each topic
 function renderButtons() {
 
     // Empty buttons div on rendering to not get repeat buttons
@@ -95,6 +94,7 @@ $("#add-topic").on("click", function (event) {
     renderButtons();
 });
 
+//create click event for all gif images that have been written to the DOM. Used function from class example.
 $(document).on("click", ".gif", function () {
     // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
     var state = $(this).attr("data-state");
@@ -111,7 +111,7 @@ $(document).on("click", ".gif", function () {
 
 });
 
-
+//click event for AlL buttons. Initial topic buttons as well as user input buttons
 $(document).on("click", ".topic-btn", displayTopicGifs);
 renderButtons();
 
